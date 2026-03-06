@@ -1,99 +1,128 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Orders API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API GraphQL para gerenciamento de pedidos, construída com NestJS, TypeORM e PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Execução
 
-## Description
+### Pré-requisitos
+- Docker e Docker Compose instalados
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+### Passos
 
 ```bash
-$ npm install
+# 1. Copie o arquivo de variáveis de ambiente
+cp .env.example .env
+
+# 2. Suba os containers
+docker compose up --build -d
+
+# 3. Acesse o GraphQL Playground
+# http://localhost:4000/graphql
 ```
 
-## Compile and run the project
+### Executar testes
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+npm test
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## Exemplos de queries GraphQL
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+### Criar usuário
+```graphql
+mutation {
+  createUser(input: { name: "Alice", email: "alice@example.com" }) {
+    id
+    name
+    email
+  }
+}
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
+### Criar produto
+```graphql
+mutation {
+  createProduct(input: { name: "Widget", price: 29.99, stock: 100 }) {
+    id
+    name
+    price
+    stock
+  }
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Emitir ordem de compra
+```graphql
+mutation {
+  createOrder(input: {
+    userId: "<user-id>",
+    items: [{ productId: "<product-id>", quantity: 2 }]
+  }) {
+    id
+    total
+    items {
+      quantity
+      price
+      product { name }
+    }
+  }
+}
+```
 
-## Resources
+### Listar usuários com pedidos
+```graphql
+query {
+  users {
+    id
+    name
+    orders {
+      id
+      total
+    }
+  }
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Decisões técnicas
 
-## Support
+### GraphQL (code-first)
+Abordagem code-first com `@nestjs/graphql` permite definir o schema diretamente nos decorators TypeScript, mantendo entidades e tipos GraphQL em sincronia sem duplicação.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### TypeORM + PostgreSQL
+TypeORM integra nativamente com NestJS e oferece suporte a `QueryRunner` com transações explícitas e **pessimistic locking** (`SELECT ... FOR UPDATE`), essencial para garantir integridade do estoque sob concorrência.
 
-## Stay in touch
+### Integridade de estoque sob concorrência
+O fluxo de criação de pedido usa:
+1. `SELECT ... FOR UPDATE` em cada produto — bloqueia a linha no banco até o commit, impedindo que duas requisições simultâneas leiam o mesmo estoque e ambas decrementem.
+2. Ordenação dos IDs dos produtos antes de adquirir os locks, evitando deadlocks quando dois pedidos disputam os mesmos produtos em ordens inversas.
+3. Rollback automático em qualquer erro, garantindo atomicidade.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Logs estruturados
+Uso do `Logger` nativo do NestJS, que emite logs com contexto (nome do serviço), timestamp e nível de severidade.
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Trade-offs considerados
+
+| Decisão | Alternativa | Motivo da escolha |
+|---|---|---|
+| TypeORM | Prisma | Suporte nativo a `SELECT FOR UPDATE` via `QueryRunner` |
+| `synchronize: true` | Migrations | Agilidade no desenvolvimento; em produção usaria migrations |
+| UUID como PK | Serial int | Evita enumeração e facilita sharding futuro |
+| Testes unitários com mocks | Testes de integração | Velocidade e isolamento; regras críticas cobertas sem depender de DB |
+
+---
+
+## O que faria diferente com mais tempo
+
+- Substituir `synchronize: true` por migrations TypeORM
+- Adicionar autenticação (JWT)
+- Implementar paginação nas queries de listagem
+- Testes de integração com banco em container (`@testcontainers/postgresql`)
+- GitHub Actions para CI (lint + testes a cada push)
+- Rate limiting e helmet para segurança básica
